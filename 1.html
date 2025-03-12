@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PIE - Cahier Personnel</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --success-color: #2ecc71;
+            --background-color: #f5f7fa;
+            --white: #ffffff;
+            --text-color: #2c3e50;
+            --text-light: #7f8c8d;
+            --shadow: 0 2px 10px rgba(0,0,0,0.1);
+            --gradient-primary: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, var(--background-color) 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 6rem auto 2rem auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+        }
+
+        h1, h2 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        /* Navigation Buttons */
+        .nav-buttons {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        .nav-btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            background: var(--secondary-color);
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.2s, background 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            background: #2980b9;
+        }
+
+        .nav-btn.save {
+            background: var(--success-color);
+        }
+
+        .nav-btn.save:hover {
+            background: #27ae60;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: #eee;
+            z-index: 1000;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--secondary-color);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* Form Styling */
+        .section {
+            margin-bottom: 40px;
+            padding: 20px;
+            border-radius: 10px;
+            background: #fff;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease;
+        }
+
+        .section:hover {
+            transform: translateY(-5px);
+        }
+
+        .question {
+            color: var(--primary-color);
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--secondary-color);
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        input[type="text"]:focus, textarea:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+            outline: none;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 12px;
+            border: 1px solid #e0e0e0;
+        }
+
+        th {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            font-weight: 600;
+        }
+
+        .numbered-input {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .numbered-input label {
+            font-weight: 500;
+            color: var(--text-color);
+            min-width: 40px;
+        }
+
+        /* Notification Styles */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            animation: slideIn 0.3s ease forwards;
+            z-index: 1000;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .notification.success {
+            background: var(--success-color);
+        }
+
+        .notification.error {
+            background: var(--accent-color);
+        }
+
+        /* Invalid input styling */
+        .invalid {
+            border-color: var(--accent-color) !important;
+            background-color: rgba(231, 76, 60, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 1rem;
+                padding: 20px;
+            }
+
+            .nav-buttons {
+                flex-direction: column;
+                right: 10px;
+                bottom: 10px;
+            }
+
+            table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+
+        /* Ajout des styles pour le footer */
+        footer {
+            background: var(--primary-color);
+            color: var(--white);
+            padding: 2rem 0;
+            margin-top: 4rem;
+            text-align: center;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 1rem 0;
+        }
+
+        .social-links a {
+            color: var(--white);
+            font-size: 1.5rem;
+            transition: transform 0.3s ease, color 0.3s ease;
+        }
+
+        .social-links a:hover {
+            transform: translateY(-3px);
+            color: var(--secondary-color);
+        }
+
+        .footer-text {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="logo">
+                <a href="index.php" style="text-decoration: none; color: inherit;">
+                    <h1>MyPIE Journal</h1>
+                </a>
+            </div>
+            <div class="nav-links">
+                <a href="index.php" class="nav-item">Accueil</a>
+                <a href="#" class="nav-item">Mon Cahier</a>
+                <a href="1.html" class="nav-item active">Quiz & Évaluation</a>
+                <a href="#" class="nav-item">Outils & Ressources</a>
+                <a href="#" class="nav-item">À propos</a>
+            </div>
+            <div class="auth-buttons">
+                <a href="login.php"><button class="btn-connexion">Connexion</button></a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Progress Bar -->
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <div class="container">
+        <h1>PREMIÈRE ANNÉE, PHASE 2 : À LA DÉCOUVERTE DE SOI</h1>
+        <h2>CAHIER PERSONNEL DU STAGIAIRE</h2>
+        
+        <div class="section">
+            <p class="question">1. Chacun écrit sur son cahier les 3 mots (tags) que vous voulez que les gens retiennent de vous :</p>
+            <div class="numbered-input">
+                <label>1.1.</label>
+                <input type="text" style="width: 90%;">
+            </div>
+            <div class="numbered-input">
+                <label>1.2.</label>
+                <input type="text" style="width: 90%;">
+            </div>
+            <div class="numbered-input">
+                <label>1.3.</label>
+                <input type="text" style="width: 90%;">
+            </div>
+        </div>
+
+        <div class="section">
+            <p class="question">2. Quelles sont les actions du quotidien que vous faites aujourd'hui qui vous permettent de justifier cela ?</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Mon Tag (reprenez les 3 mots que vous venez d'indiquer)</th>
+                        <th>Donnez un exemple d'une action que vous faites au quotidien qui prouve votre tag</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1-</td>
+                        <td><textarea></textarea></td>
+                    </tr>
+                    <tr>
+                        <td>2-</td>
+                        <td><textarea></textarea></td>
+                    </tr>
+                    <tr>
+                        <td>3-</td>
+                        <td><textarea></textarea></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <p class="question">3. Êtes vous une personne de confiance ? Si oui, pourquoi ? Si non, pourquoi ?</p>
+            <textarea style="min-height: 100px;"></textarea>
+        </div>
+
+        <div class="section">
+            <p class="question">4. Quels sont les mots qu'ont écrit vos collègues</p>
+            <div class="numbered-input">
+                <label>4.1.</label>
+                <input type="text" style="width: 90%;">
+            </div>
+            <div class="numbered-input">
+                <label>4.2.</label>
+                <input type="text" style="width: 90%;">
+            </div>
+            <div class="numbered-input">
+                <label>4.3.</label>
+                <input type="text" style="width: 90%;">
+            </div>
+            <div class="numbered-input">
+                <label>4.4.</label>
+                <input type="text" style="width: 90%;">
+            </div>
+            <div class="numbered-input">
+                <label>4.5.</label>
+                <input type="text" style="width: 90%;">
+            </div>
+            <div class="numbered-input">
+                <label>4.6.</label>
+                <input type="text" style="width: 90%;">
+            </div>
+            <div class="numbered-input">
+                <label>4.7.</label>
+                <input type="text" style="width: 90%;">
+            </div>
+            <div class="numbered-input">
+                <label>4.8.</label>
+                <input type="text" style="width: 90%;">
+            </div>
+            <div class="numbered-input">
+                <label>4.9.</label>
+                <input type="text" style="width: 90%;">
+            </div>
+            <div class="numbered-input">
+                <label>4.10.</label>
+                <input type="text" style="width: 90%;">
+            </div>
+            <div class="numbered-input">
+                <label>4.11.</label>
+                <input type="text" style="width: 90%;">
+            </div>
+
+            <p class="question" style="margin-top: 20px;">Quels sont les points communs ? Les différences ?</p>
+            <textarea style="min-height: 100px;"></textarea>
+        </div>
+
+        <div class="section">
+            <p class="question">Comment construire votre réputation autour des mots clés que vous voulez ? même si vous n'êtes pas encore aujourd'hui ce que vous voulez devenir</p>
+            <textarea style="min-height: 150px;"></textarea>
+        </div>
+
+        <div class="section">
+            <p class="question">Que signifie "être exemplaire" ?</p>
+            <textarea style="min-height: 150px;"></textarea>
+        </div>
+
+        <div class="section">
+            <p class="question">Comment pouvez-vous devenir exemplaire ?</p>
+            <textarea style="min-height: 150px;"></textarea>
+        </div>
+
+        <div class="section">
+            <p class="question">Que devez vous apprendre pour devenir exemplaire ?</p>
+            <textarea style="min-height: 150px;"></textarea>
+        </div>
+
+        <div class="section">
+            <h2>LES VALEURS</h2>
+            
+            <div class="subsection">
+                <p class="question">Réflexion individuelle : Quelles sont vos 5 valeurs clés avec lesquelles vous vivez au quotidien ? Notez ces valeurs sur votre cahier</p>
+                <div class="numbered-input">
+                    <label>1.</label>
+                    <input type="text" style="width: 90%;">
+                </div>
+                <div class="numbered-input">
+                    <label>2.</label>
+                    <input type="text" style="width: 90%;">
+                </div>
+                <div class="numbered-input">
+                    <label>3.</label>
+                    <input type="text" style="width: 90%;">
+                </div>
+                <div class="numbered-input">
+                    <label>4.</label>
+                    <input type="text" style="width: 90%;">
+                </div>
+                <div class="numbered-input">
+                    <label>5.</label>
+                    <input type="text" style="width: 90%;">
+                </div>
+            </div>
+
+            <div class="subsection">
+                <p class="question">Demandez à vos collègues de faire une liste des 5 valeurs qui vous caractérisent</p>
+                <div class="numbered-input">
+                    <label>1.</label>
+                    <input type="text" style="width: 90%;">
+                </div>
+                <div class="numbered-input">
+                    <label>2.</label>
+                    <input type="text" style="width: 90%;">
+                </div>
+                <div class="numbered-input">
+                    <label>3.</label>
+                    <input type="text" style="width: 90%;">
+                </div>
+                <div class="numbered-input">
+                    <label>4.</label>
+                    <input type="text" style="width: 90%;">
+                </div>
+                <div class="numbered-input">
+                    <label>5.</label>
+                    <input type="text" style="width: 90%;">
+                </div>
+            </div>
+
+            <div class="subsection">
+                <p class="question">Débrief collectif en groupe sur les écarts ou les similarités que vous avez trouvé (écrivez vos réflexions personnelles que les écarts constatés et les actions à faire dans les cas d'écart</p>
+                <textarea style="min-height: 150px;"></textarea>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>LES CAUSES</h2>
+            
+            <div class="subsection">
+                <p class="question">Y-a-t-il des causes qui te tiennent à cœur sur lesquelles tu veux contribuer ?</p>
+                <div class="numbered-input" style="list-style-type: circle;">
+                    <input type="text" style="width: 95%; margin-bottom: 10px;">
+                    <input type="text" style="width: 95%; margin-bottom: 10px;">
+                    <input type="text" style="width: 95%; margin-bottom: 10px;">
+                    <input type="text" style="width: 95%; margin-bottom: 10px;">
+                    <input type="text" style="width: 95%; margin-bottom: 10px;">
+                </div>
+            </div>
+
+            <div class="subsection">
+                <p class="question">Quelles sont les actions concrètes que tu fais aujourd'hui qui prouvent que ces causes te tiennent à cœur ?</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>La cause qui me tient à cœur</th>
+                            <th>Quelles sont les actions concrètes que je fais chaque jour/ semaine</th>
+                            <th>est ce que je lis des livres/ articles sur le sujet ?</th>
+                            <th>est ce que je suis au courant de l'actualité ?</th>
+                            <th>Est ce que je suis engagé dans des groupes/ associations... sur la thématique</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><textarea></textarea></td>
+                            <td><textarea></textarea></td>
+                            <td><textarea></textarea></td>
+                            <td><textarea></textarea></td>
+                            <td><textarea></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><textarea></textarea></td>
+                            <td><textarea></textarea></td>
+                            <td><textarea></textarea></td>
+                            <td><textarea></textarea></td>
+                            <td><textarea></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><textarea></textarea></td>
+                            <td><textarea></textarea></td>
+                            <td><textarea></textarea></td>
+                            <td><textarea></textarea></td>
+                            <td><textarea></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><textarea></textarea></td>
+                            <td><textarea></textarea></td>
+                            <td><textarea></textarea></td>
+                            <td><textarea></textarea></td>
+                            <td><textarea></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><textarea></textarea></td>
+                            <td><textarea></textarea></td>
+                            <td><textarea></textarea></td>
+                            <td><textarea></textarea></td>
+                            <td><textarea></textarea></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="subsection">
+                <p class="question">Si tu ne fais pas d'actions aujourd'hui, souhaiterais-tu t'engager dans une cause pour le mois prochain ?</p>
+                <textarea style="min-height: 150px;"></textarea>
+            </div>
+        </div>
+
+        <!-- Navigation Buttons -->
+        <div class="nav-buttons">
+            <button class="nav-btn" id="prevSection">
+                <i class="fas fa-arrow-left"></i> Précédent
+            </button>
+            <button class="nav-btn" id="nextSection">
+                Suivant <i class="fas fa-arrow-right"></i>
+            </button>
+            <button class="nav-btn save" id="saveForm">
+                <i class="fas fa-save"></i> Enregistrer
+            </button>
+        </div>
+    </div>
+
+    <footer>
+        <div class="social-links">
+            <a href="https://facebook.com" target="_blank" title="Facebook">
+                <i class="fab fa-facebook"></i>
+            </a>
+            <a href="https://twitter.com" target="_blank" title="Twitter">
+                <i class="fab fa-twitter"></i>
+            </a>
+            <a href="https://linkedin.com" target="_blank" title="LinkedIn">
+                <i class="fab fa-linkedin"></i>
+            </a>
+            <a href="https://instagram.com" target="_blank" title="Instagram">
+                <i class="fab fa-instagram"></i>
+            </a>
+            <a href="https://youtube.com" target="_blank" title="YouTube">
+                <i class="fab fa-youtube"></i>
+            </a>
+        </div>
+        <p class="footer-text">&copy; 2024 MyPIE Journal. Tous droits réservés.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const sections = document.querySelectorAll('.section');
+            const progressBar = document.getElementById('progressBar');
+            const prevBtn = document.getElementById('prevSection');
+            const nextBtn = document.getElementById('nextSection');
+            const saveBtn = document.getElementById('saveForm');
+            let currentSection = 0;
+
+            // Initialize
+            updateNavigation();
+            updateProgressBar();
+
+            // Navigation buttons
+            prevBtn.addEventListener('click', () => {
+                if (currentSection > 0) {
+                    currentSection--;
+                    scrollToSection(currentSection);
+                    updateNavigation();
+                    updateProgressBar();
+                }
+            });
+
+            nextBtn.addEventListener('click', () => {
+                if (currentSection < sections.length - 1) {
+                    currentSection++;
+                    scrollToSection(currentSection);
+                    updateNavigation();
+                    updateProgressBar();
+                }
+            });
+
+            // Save functionality
+            saveBtn.addEventListener('click', async () => {
+                // Vérifier si tous les champs sont remplis
+                const inputs = document.querySelectorAll('input[type="text"]');
+                const textareas = document.querySelectorAll('textarea');
+                let isEmpty = false;
+
+                // Vérifier les inputs
+                inputs.forEach(input => {
+                    if (!input.value.trim()) {
+                        input.classList.add('invalid');
+                        isEmpty = true;
+                    } else {
+                        input.classList.remove('invalid');
+                    }
+                });
+
+                // Vérifier les textareas
+                textareas.forEach(textarea => {
+                    if (!textarea.value.trim()) {
+                        textarea.classList.add('invalid');
+                        isEmpty = true;
+                    } else {
+                        textarea.classList.remove('invalid');
+                    }
+                });
+
+                if (isEmpty) {
+                    showNotification('Veuillez remplir tous les champs avant d\'enregistrer', 'error');
+                    return;
+                }
+
+                try {
+                    saveBtn.disabled = true;
+                    saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enregistrement...';
+                    
+                    // Simulate saving (replace with actual form submission)
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    
+                    showNotification('Formulaire enregistré avec succès!', 'success');
+                } catch (error) {
+                    showNotification('Erreur lors de l\'enregistrement', 'error');
+                } finally {
+                    saveBtn.disabled = false;
+                    saveBtn.innerHTML = '<i class="fas fa-save"></i> Enregistrer';
+                }
+            });
+
+            // Helper functions
+            function scrollToSection(index) {
+                sections[index].scrollIntoView({ behavior: 'smooth' });
+            }
+
+            function updateNavigation() {
+                prevBtn.style.display = currentSection === 0 ? 'none' : 'flex';
+                nextBtn.style.display = currentSection === sections.length - 1 ? 'none' : 'flex';
+            }
+
+            function updateProgressBar() {
+                const progress = ((currentSection + 1) / sections.length) * 100;
+                progressBar.style.width = `${progress}%`;
+            }
+
+            function showNotification(message, type) {
+                const notification = document.createElement('div');
+                notification.className = `notification ${type}`;
+                notification.innerHTML = message;
+                document.body.appendChild(notification);
+
+                setTimeout(() => {
+                    notification.remove();
+                }, 3000);
+            }
+
+            // Form validation
+            document.querySelectorAll('input[required], textarea[required]').forEach(element => {
+                element.addEventListener('input', function() {
+                    this.classList.toggle('invalid', !this.checkValidity());
+                });
+            });
+        });
+    </script>
+</body>
+</html>
